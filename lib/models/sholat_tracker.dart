@@ -13,6 +13,7 @@ class SholatTracker {
     this.status = 'belum',
     this.catatan,
     this.createdAt,
+    required this.timezone,
   });
 
   SholatTracker copyWith({
@@ -22,6 +23,7 @@ class SholatTracker {
     String? status,
     String? catatan,
     String? createdAt,
+    String? timezone,
   }) {
     return SholatTracker(
       id: id ?? this.id,
@@ -30,6 +32,7 @@ class SholatTracker {
       status: status ?? this.status,
       catatan: catatan ?? this.catatan,
       createdAt: createdAt ?? this.createdAt,
+      timezone: timezone ?? this.timezone,
     );
   }
 
@@ -40,6 +43,7 @@ class SholatTracker {
       'waktu': waktu,
       'status': status,
       'catatan': catatan,
+      'timezone': timezone,
       if (createdAt != null) 'created_at': createdAt,
     };
   }
@@ -52,6 +56,7 @@ class SholatTracker {
       status: map['status'] ?? 'belum',
       catatan: map['catatan'],
       createdAt: map['created_at'],
+      timezone: map['timezone'] ?? '',
     );
   }
 }
