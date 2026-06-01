@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/sholat_tracker.dart';
 import '../repositories/sholat_repository.dart';
+import '../services/prayer_time_service.dart';
 
 class SholatScreen extends StatefulWidget {
   final SholatRepository sholatRepository;
@@ -22,6 +23,7 @@ class _SholatScreenState extends State<SholatScreen> {
   bool _isLoading = true;
   int _streak = 0;
   String _userName = 'Pengguna';
+  String _cityLocation = 'Jakarta';
 
   final List<String> _daftarWaktu = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
 
@@ -64,9 +66,11 @@ class _SholatScreenState extends State<SholatScreen> {
 
   Future<void> _loadLocalPrefs() async {
     final prefs = await SharedPreferences.getInstance();
+    final activeIndex = prefs.getInt('active_user_index') ?? 1;
     setState(() {
       _streak = prefs.getInt('user_streak') ?? 0;
-      _userName = prefs.getString('user_name') ?? 'Pengguna';
+      _userName = prefs.getString('user_name_$activeIndex') ?? (activeIndex == 1 ? (prefs.getString('user_name') ?? 'Pengguna 1') : 'Pengguna 2');
+      _cityLocation = prefs.getString('city_location_$activeIndex') ?? 'Jakarta';
     });
   }
 
@@ -207,6 +211,24 @@ class _SholatScreenState extends State<SholatScreen> {
                             color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.location_on_rounded,
+                              size: 14,
+                              color: isDark ? Colors.purpleAccent : const Color(0xFF8E2DE2),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _cityLocation,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: isDark ? Colors.white60 : Colors.black54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     Container(
@@ -263,38 +285,33 @@ class _SholatScreenState extends State<SholatScreen> {
                             children: _currentTrackers.map((tracker) {
                               IconData icon;
                               Color accentColor;
-                              String timeStr;
+                              final prayerTimes = PrayerTimeService.getPrayerTimes(_cityLocation);
+                              final String timeStr = prayerTimes[tracker.waktu] ?? '--:--';
 
                               switch (tracker.waktu) {
                                 case 'Subuh':
                                   icon = Icons.wb_twilight;
                                   accentColor = Colors.blueAccent;
-                                  timeStr = '04:35 WIB';
                                   break;
                                 case 'Dzuhur':
                                   icon = Icons.wb_sunny_rounded;
                                   accentColor = Colors.amber;
-                                  timeStr = '11:53 WIB';
                                   break;
                                 case 'Ashar':
                                   icon = Icons.wb_cloudy_rounded;
                                   accentColor = Colors.orange;
-                                  timeStr = '15:15 WIB';
                                   break;
                                 case 'Maghrib':
                                   icon = Icons.wb_twilight_rounded;
                                   accentColor = Colors.deepOrangeAccent;
-                                  timeStr = '17:48 WIB';
                                   break;
                                 case 'Isya':
                                   icon = Icons.brightness_3_rounded;
                                   accentColor = Colors.indigoAccent;
-                                  timeStr = '19:01 WIB';
                                   break;
                                 default:
                                   icon = Icons.star_border_rounded;
                                   accentColor = Colors.purple;
-                                  timeStr = '--:--';
                               }
 
                               return Padding(
