@@ -4,9 +4,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'db/database_helper.dart';
 import 'repositories/sholat_repository.dart';
 import 'repositories/target_repository.dart';
+import 'repositories/doa_repository.dart';
+import 'repositories/jurnal_repository.dart';
 import 'services/preference_service.dart';
+import 'services/prayer_time_service.dart';
 import 'screens/sholat_screen.dart';
 import 'screens/target_screen.dart';
+import 'screens/doa_screen.dart';
+import 'screens/jurnal_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -119,6 +124,8 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   final SholatRepository _sholatRepository = SholatRepository();
   final TargetRepository _targetRepository = TargetRepository();
+  final DoaRepository _doaRepository = DoaRepository();
+  final JurnalRepository _jurnalRepository = JurnalRepository();
   final GlobalKey<State<SholatScreen>> _sholatScreenKey = GlobalKey();
 
   String _userName = 'Pengguna';
@@ -131,87 +138,27 @@ class _MainScreenState extends State<MainScreen> {
 
   Future<void> _loadUserName() async {
     final prefs = await SharedPreferences.getInstance();
+    final activeIndex = prefs.getInt('active_user_index') ?? 1;
     setState(() {
-      _userName = prefs.getString('user_name') ?? 'Pengguna';
+      _userName = prefs.getString('user_name_$activeIndex') ?? (activeIndex == 1 ? (prefs.getString('user_name') ?? 'Pengguna 1') : 'Pengguna 2');
     });
   }
 
   void _showProfileSettingsDialog() {
-    final nameController = TextEditingController(text: _userName);
-    final formKey = GlobalKey<FormState>();
-
     showDialog(
       context: context,
       builder: (context) {
-        final isDark = Theme.of(context).brightness == Brightness.dark;
-
-        return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          title: Text(
-            'Pengaturan Profil',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
-          ),
-          content: Form(
-            key: formKey,
-            child: TextFormField(
-              controller: nameController,
-              decoration: InputDecoration(
-                labelText: 'Nama Pengguna',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              validator: (val) {
-                if (val == null || val.trim().isEmpty) {
-                  return 'Nama tidak boleh kosong';
-                }
-                return null;
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(
-                'Batal',
-                style: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                if (formKey.currentState!.validate()) {
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('user_name', nameController.text.trim());
-                  Navigator.pop(context);
-                  _loadUserName();
-                  // Notify SholatScreen to update user name
-                  if (_sholatScreenKey.currentState != null) {
-                    // ignore: invalid_use_of_protected_member
-                    _sholatScreenKey.currentState!.setState(() {
-                      (_sholatScreenKey.currentState as dynamic).refreshUserName();
-                    });
-                  }
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8E2DE2),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
-              child: const Text(
-                'Simpan',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+        return ProfileSettingsDialog(
+          onSaved: () {
+            _loadUserName();
+            // Notify SholatScreen to update user name & city info
+            if (_sholatScreenKey.currentState != null) {
+              // ignore: invalid_use_of_protected_member
+              _sholatScreenKey.currentState!.setState(() {
+                (_sholatScreenKey.currentState as dynamic).refreshUserName();
+              });
+            }
+          },
         );
       },
     );
@@ -229,13 +176,34 @@ class _MainScreenState extends State<MainScreen> {
       TargetScreen(
         targetRepository: _targetRepository,
       ),
+      DoaScreen(
+        doaRepository: _doaRepository,
+      ),
+      JurnalScreen(
+        jurnalRepository: _jurnalRepository,
+      ),
     ];
+
+    String getAppBarTitle() {
+      switch (_currentIndex) {
+        case 0:
+          return 'Sholat Tracker';
+        case 1:
+          return 'Target Ibadah';
+        case 2:
+          return 'Catatan Doa & Dzikir';
+        case 3:
+          return 'Jurnal Ibadah';
+        default:
+          return 'Tracker Ibadah';
+      }
+    }
 
     return Scaffold(
       backgroundColor: isDark ? const Color(0xFF0F0C20) : const Color(0xFFF3F2F7),
       appBar: AppBar(
         title: Text(
-          _currentIndex == 0 ? 'Sholat Tracker' : 'Target Ibadah',
+          getAppBarTitle(),
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : Colors.black87,
@@ -306,9 +274,303 @@ class _MainScreenState extends State<MainScreen> {
               ),
               label: 'Target',
             ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.menu_book_rounded,
+                color: isDark ? Colors.white70 : Colors.black54,
+              ),
+              selectedIcon: const Icon(
+                Icons.menu_book_rounded,
+                color: Color(0xFF8E2DE2),
+              ),
+              label: 'Doa/Dzikir',
+            ),
+            NavigationDestination(
+              icon: Icon(
+                Icons.edit_note_rounded,
+                color: isDark ? Colors.white70 : Colors.black54,
+              ),
+              selectedIcon: const Icon(
+                Icons.edit_note_rounded,
+                color: Color(0xFF8E2DE2),
+              ),
+              label: 'Jurnal',
+            ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class ProfileSettingsDialog extends StatefulWidget {
+  final VoidCallback onSaved;
+  const ProfileSettingsDialog({super.key, required this.onSaved});
+
+  @override
+  State<ProfileSettingsDialog> createState() => _ProfileSettingsDialogState();
+}
+
+class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
+  late int _activeIndex;
+  late TextEditingController _nameController1;
+  late TextEditingController _nameController2;
+  late String _city1;
+  late String _city2;
+  bool _isLoading = true;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileData();
+  }
+
+  Future<void> _loadProfileData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _activeIndex = prefs.getInt('active_user_index') ?? 1;
+
+      final name1 = prefs.getString('user_name_1') ?? (prefs.getString('user_name') ?? 'Pengguna 1');
+      _nameController1 = TextEditingController(text: name1);
+      _city1 = prefs.getString('city_location_1') ?? 'Jakarta';
+
+      final name2 = prefs.getString('user_name_2') ?? 'Pengguna 2';
+      _nameController2 = TextEditingController(text: name2);
+      _city2 = prefs.getString('city_location_2') ?? 'Surabaya';
+
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _nameController1.dispose();
+    _nameController2.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (_formKey.currentState!.validate()) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('active_user_index', _activeIndex);
+
+      await prefs.setString('user_name_1', _nameController1.text.trim());
+      await prefs.setString('city_location_1', _city1);
+
+      await prefs.setString('user_name_2', _nameController2.text.trim());
+      await prefs.setString('city_location_2', _city2);
+
+      // default user_name for backwards compatibility
+      if (_activeIndex == 1) {
+        await prefs.setString('user_name', _nameController1.text.trim());
+      } else {
+        await prefs.setString('user_name', _nameController2.text.trim());
+      }
+
+      widget.onSaved();
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cities = PrayerTimeService.getAvailableCities();
+
+    return AlertDialog(
+      backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      title: Text(
+        'Pengaturan 2 Profil Pengguna',
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+      content: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Pilih Profil Aktif:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Profile selector row
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _activeIndex = 1;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: _activeIndex == 1
+                              ? const Color(0xFF8E2DE2).withOpacity(0.15)
+                              : (isDark ? const Color(0xFF130E26) : Colors.grey[200]),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: _activeIndex == 1 ? const Color(0xFF8E2DE2) : Colors.transparent,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.person_rounded, color: Color(0xFF8E2DE2)),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Profil 1',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _activeIndex = 2;
+                        });
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: _activeIndex == 2
+                              ? const Color(0xFF8E2DE2).withOpacity(0.15)
+                              : (isDark ? const Color(0xFF130E26) : Colors.grey[200]),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: _activeIndex == 2 ? const Color(0xFF8E2DE2) : Colors.transparent,
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.person_outline_rounded, color: Colors.blueAccent),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Profil 2',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Divider(),
+              const SizedBox(height: 12),
+              Text(
+                'Detail Profil $_activeIndex:',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                  color: _activeIndex == 1 ? const Color(0xFF8E2DE2) : Colors.blueAccent,
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextFormField(
+                controller: _activeIndex == 1 ? _nameController1 : _nameController2,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                decoration: InputDecoration(
+                  labelText: 'Nama Pengguna',
+                  labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  prefixIcon: const Icon(Icons.edit_rounded, size: 20),
+                ),
+                validator: (val) {
+                  if (val == null || val.trim().isEmpty) {
+                    return 'Nama tidak boleh kosong';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _activeIndex == 1 ? _city1 : _city2,
+                dropdownColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                decoration: InputDecoration(
+                  labelText: 'Lokasi Kota (Info Sholat)',
+                  labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                  prefixIcon: const Icon(Icons.location_on_rounded, size: 20),
+                ),
+                items: cities.map((city) {
+                  return DropdownMenuItem<String>(
+                    value: city,
+                    child: Text(city),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      if (_activeIndex == 1) {
+                        _city1 = val;
+                      } else {
+                        _city2 = val;
+                      }
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(
+            'Batal',
+            style: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: _save,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF8E2DE2),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          ),
+          child: const Text(
+            'Simpan',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
     );
   }
 }
