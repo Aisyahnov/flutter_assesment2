@@ -70,7 +70,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Hapus Jurnal?', style: TextStyle(fontWeight: FontWeight.bold)),
           content: const Text('Apakah Anda yakin ingin menghapus catatan jurnal ini?'),
@@ -114,7 +114,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
             final isDark = Theme.of(context).brightness == Brightness.dark;
 
             return AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+              backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               title: Text(
                 isEdit ? 'Edit Jurnal Ibadah' : 'Tulis Jurnal Ibadah',
@@ -153,11 +153,11 @@ class _JurnalScreenState extends State<JurnalScreen> {
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? const Color(0xFF8E2DE2).withOpacity(0.2)
+                                    ? const Color(0xFF1C6758).withOpacity(0.2)
                                     : Colors.transparent,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: isSelected ? const Color(0xFF8E2DE2) : Colors.transparent,
+                                  color: isSelected ? const Color(0xFF1C6758) : Colors.transparent,
                                   width: 1.5,
                                 ),
                               ),
@@ -176,7 +176,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: const Color(0xFF8E2DE2),
+                            color: const Color(0xFF1C6758),
                           ),
                         ),
                       ),
@@ -250,7 +250,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF8E2DE2),
+                    backgroundColor: const Color(0xFF1C6758),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   ),
@@ -277,8 +277,8 @@ class _JurnalScreenState extends State<JurnalScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF0F0C20), const Color(0xFF15102A)]
-                : [const Color(0xFFF3F2F7), const Color(0xFFE8E7F0)],
+                ? [const Color(0xFF09201C), const Color(0xFF0B2B26)]
+                : [const Color(0xFFF2F9F7), const Color(0xFFE2F0EA)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -335,7 +335,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
       floatingActionButton: _jurnalEntries.isEmpty && !_isLoading
           ? FloatingActionButton.extended(
               onPressed: () => _showAddEditJurnalDialog(),
-              backgroundColor: const Color(0xFF8E2DE2),
+              backgroundColor: const Color(0xFF1C6758),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               icon: const Icon(Icons.edit_note_rounded, color: Colors.white, size: 24),
               label: const Text('Tulis Jurnal', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -372,19 +372,19 @@ class _JurnalScreenState extends State<JurnalScreen> {
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                        colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                        colors: [Color(0xFF1C6758), Color(0xFF0E4338)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
                     : null,
                 color: !isSelected
-                    ? (isDark ? const Color(0xFF1E1938) : Colors.white)
+                    ? (isDark ? const Color(0xFF133630) : Colors.white)
                     : null,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF4A00E0).withOpacity(0.4),
+                          color: const Color(0xFF0E4338).withOpacity(0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         )
@@ -399,7 +399,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
                 border: Border.all(
                   color: isSelected
                       ? Colors.transparent
-                      : (isDark ? const Color(0xFF2C2450) : Colors.black12),
+                      : (isDark ? const Color(0xFF1C4F46) : Colors.black12),
                   width: 1,
                 ),
               ),
@@ -474,7 +474,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
   Widget _buildJurnalCard(ThemeData theme, JurnalHarian jurnal, bool isDark) {
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1938) : Colors.white,
+        color: isDark ? const Color(0xFF133630) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -484,7 +484,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
           )
         ],
         border: Border.all(
-          color: isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05),
+          color: isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05),
           width: 1,
         ),
       ),
@@ -499,7 +499,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8E2DE2).withOpacity(0.15),
+                    color: const Color(0xFF1C6758).withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -522,7 +522,7 @@ class _JurnalScreenState extends State<JurnalScreen> {
                 ),
                 const Spacer(),
                 IconButton(
-                  icon: const Icon(Icons.edit_rounded, color: Color(0xFF8E2DE2), size: 22),
+                  icon: const Icon(Icons.edit_rounded, color: Color(0xFF1C6758), size: 22),
                   onPressed: () => _showAddEditJurnalDialog(jurnal: jurnal),
                 ),
                 IconButton(

@@ -65,7 +65,8 @@ class SholatRepository {
       if (data.containsKey(sholat.tanggal)) {
         final List<dynamic> listJson = data[sholat.tanggal];
         final List<SholatTracker> list = listJson.map((m) => SholatTracker.fromMap(m)).toList();
-        final idx = list.indexWhere((t) => t.id == sholat.id || t.waktu == sholat.waktu);
+        // Cukup gunakan waktu untuk mencocokkan, karena ID bisa duplikat saat loop insert sangat cepat
+        final idx = list.indexWhere((t) => t.waktu == sholat.waktu);
         if (idx != -1) {
           list[idx] = sholat;
           data[sholat.tanggal] = list.map((t) => t.toMap()).toList();
@@ -75,6 +76,7 @@ class SholatRepository {
       }
       return 0;
     }
+
 
     final db = await _dbHelper.database;
     return await db.update(

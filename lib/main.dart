@@ -12,9 +12,12 @@ import 'screens/sholat_screen.dart';
 import 'screens/target_screen.dart';
 import 'screens/doa_screen.dart';
 import 'screens/jurnal_screen.dart';
+import 'screens/home_screen.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   if (!kIsWeb) {
     final db = await DatabaseHelper.instance.database;
     print('DB berhasil dibuka: ${db.path}');
@@ -67,10 +70,10 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF8E2DE2),
+          seedColor: const Color(0xFF1C6758),
           brightness: Brightness.light,
-          primary: const Color(0xFF8E2DE2),
-          secondary: const Color(0xFF4A00E0),
+          primary: const Color(0xFF1C6758),
+          secondary: const Color(0xFF0E4338),
           surface: Colors.white,
         ),
         appBarTheme: const AppBarTheme(
@@ -84,12 +87,12 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF8E2DE2),
+          seedColor: const Color(0xFF1C6758),
           brightness: Brightness.dark,
-          primary: const Color(0xFF8E2DE2),
-          secondary: const Color(0xFF4A00E0),
-          surface: const Color(0xFF1E1938),
-          background: const Color(0xFF0F0C20),
+          primary: const Color(0xFF1C6758),
+          secondary: const Color(0xFF0E4338),
+          surface: const Color(0xFF133630),
+          background: const Color(0xFF09201C),
         ),
         appBarTheme: const AppBarTheme(
           elevation: 0,
@@ -129,28 +132,30 @@ class _MainScreenState extends State<MainScreen> {
   final GlobalKey<State<SholatScreen>> _sholatScreenKey = GlobalKey();
 
   String _userName = 'Pengguna';
+  String _cityLocation = 'Jakarta';
 
   @override
   void initState() {
     super.initState();
-    _loadUserName();
+    _loadUserData();
   }
 
-  Future<void> _loadUserName() async {
-    final prefs = await SharedPreferences.getInstance();
-    final activeIndex = prefs.getInt('active_user_index') ?? 1;
+  Future<void> _loadUserData() async {
+    final name = await PreferenceService.getUserName();
+    final city = await PreferenceService.getCityLocation();
     setState(() {
-      _userName = prefs.getString('user_name_$activeIndex') ?? (activeIndex == 1 ? (prefs.getString('user_name') ?? 'Pengguna 1') : 'Pengguna 2');
+      _userName = name;
+      _cityLocation = city;
     });
   }
 
-  void _showProfileSettingsDialog() {
+  void _showSettingsDialog() {
     showDialog(
       context: context,
       builder: (context) {
-        return ProfileSettingsDialog(
+        return SettingsDialog(
           onSaved: () {
-            _loadUserName();
+            _loadUserData();
             // Notify SholatScreen to update user name & city info
             if (_sholatScreenKey.currentState != null) {
               // ignore: invalid_use_of_protected_member
@@ -169,6 +174,17 @@ class _MainScreenState extends State<MainScreen> {
     final isDark = widget.isDarkMode;
 
     final List<Widget> screens = [
+      HomeScreen(
+        userName: _userName,
+        cityLocation: _cityLocation,
+        sholatRepository: _sholatRepository,
+        targetRepository: _targetRepository,
+        onNavigate: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
       SholatScreen(
         key: _sholatScreenKey,
         sholatRepository: _sholatRepository,
@@ -187,20 +203,22 @@ class _MainScreenState extends State<MainScreen> {
     String getAppBarTitle() {
       switch (_currentIndex) {
         case 0:
-          return 'Sholat Tracker';
+          return 'IbadahKu';
         case 1:
-          return 'Target Ibadah';
+          return 'Sholat Tracker';
         case 2:
-          return 'Catatan Doa & Dzikir';
+          return 'Target Ibadah';
         case 3:
+          return 'Catatan Doa & Dzikir';
+        case 4:
           return 'Jurnal Ibadah';
         default:
-          return 'Tracker Ibadah';
+          return 'IbadahKu';
       }
     }
 
     return Scaffold(
-      backgroundColor: isDark ? const Color(0xFF0F0C20) : const Color(0xFFF3F2F7),
+      backgroundColor: isDark ? const Color(0xFF09201C) : const Color(0xFFF2F9F7),
       appBar: AppBar(
         title: Text(
           getAppBarTitle(),
@@ -222,7 +240,7 @@ class _MainScreenState extends State<MainScreen> {
               Icons.account_circle_outlined,
               color: isDark ? Colors.white : Colors.black87,
             ),
-            onPressed: _showProfileSettingsDialog,
+            onPressed: _showSettingsDialog,
           ),
           const SizedBox(width: 8),
         ],
@@ -248,10 +266,21 @@ class _MainScreenState extends State<MainScreen> {
               _currentIndex = index;
             });
           },
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
-          indicatorColor: const Color(0xFF8E2DE2).withOpacity(0.2),
+          backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
+          indicatorColor: const Color(0xFF1C6758).withOpacity(0.2),
           elevation: 0,
           destinations: [
+            NavigationDestination(
+              icon: Icon(
+                Icons.home_rounded,
+                color: isDark ? Colors.white70 : Colors.black54,
+              ),
+              selectedIcon: const Icon(
+                Icons.home_rounded,
+                color: Color(0xFF1C6758),
+              ),
+              label: 'Beranda',
+            ),
             NavigationDestination(
               icon: Icon(
                 Icons.checklist_rounded,
@@ -259,7 +288,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               selectedIcon: const Icon(
                 Icons.checklist_rounded,
-                color: Color(0xFF8E2DE2),
+                color: Color(0xFF1C6758),
               ),
               label: 'Sholat',
             ),
@@ -270,7 +299,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               selectedIcon: const Icon(
                 Icons.task_alt_rounded,
-                color: Color(0xFF8E2DE2),
+                color: Color(0xFF1C6758),
               ),
               label: 'Target',
             ),
@@ -281,9 +310,9 @@ class _MainScreenState extends State<MainScreen> {
               ),
               selectedIcon: const Icon(
                 Icons.menu_book_rounded,
-                color: Color(0xFF8E2DE2),
+                color: Color(0xFF1C6758),
               ),
-              label: 'Doa/Dzikir',
+              label: 'Doa',
             ),
             NavigationDestination(
               icon: Icon(
@@ -292,7 +321,7 @@ class _MainScreenState extends State<MainScreen> {
               ),
               selectedIcon: const Icon(
                 Icons.edit_note_rounded,
-                color: Color(0xFF8E2DE2),
+                color: Color(0xFF1C6758),
               ),
               label: 'Jurnal',
             ),
@@ -303,20 +332,18 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class ProfileSettingsDialog extends StatefulWidget {
+class SettingsDialog extends StatefulWidget {
   final VoidCallback onSaved;
-  const ProfileSettingsDialog({super.key, required this.onSaved});
+  const SettingsDialog({super.key, required this.onSaved});
 
   @override
-  State<ProfileSettingsDialog> createState() => _ProfileSettingsDialogState();
+  State<SettingsDialog> createState() => _SettingsDialogState();
 }
 
-class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
-  late int _activeIndex;
-  late TextEditingController _nameController1;
-  late TextEditingController _nameController2;
-  late String _city1;
-  late String _city2;
+class _SettingsDialogState extends State<SettingsDialog> {
+  late TextEditingController _nameController;
+  late String _city;
+  bool _notifEnabled = true;
   bool _isLoading = true;
   final _formKey = GlobalKey<FormState>();
 
@@ -327,49 +354,31 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
   }
 
   Future<void> _loadProfileData() async {
-    final prefs = await SharedPreferences.getInstance();
+    final name = await PreferenceService.getUserName();
+    final city = await PreferenceService.getCityLocation();
+    final notif = await PreferenceService.getNotifEnabled();
     setState(() {
-      _activeIndex = prefs.getInt('active_user_index') ?? 1;
-
-      final name1 = prefs.getString('user_name_1') ?? (prefs.getString('user_name') ?? 'Pengguna 1');
-      _nameController1 = TextEditingController(text: name1);
-      _city1 = prefs.getString('city_location_1') ?? 'Jakarta';
-
-      final name2 = prefs.getString('user_name_2') ?? 'Pengguna 2';
-      _nameController2 = TextEditingController(text: name2);
-      _city2 = prefs.getString('city_location_2') ?? 'Surabaya';
-
+      _nameController = TextEditingController(text: name);
+      _city = city;
+      _notifEnabled = notif;
       _isLoading = false;
     });
   }
 
   @override
   void dispose() {
-    _nameController1.dispose();
-    _nameController2.dispose();
+    _nameController.dispose();
     super.dispose();
   }
 
   Future<void> _save() async {
     if (_formKey.currentState!.validate()) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt('active_user_index', _activeIndex);
-
-      await prefs.setString('user_name_1', _nameController1.text.trim());
-      await prefs.setString('city_location_1', _city1);
-
-      await prefs.setString('user_name_2', _nameController2.text.trim());
-      await prefs.setString('city_location_2', _city2);
-
-      // default user_name for backwards compatibility
-      if (_activeIndex == 1) {
-        await prefs.setString('user_name', _nameController1.text.trim());
-      } else {
-        await prefs.setString('user_name', _nameController2.text.trim());
-      }
+      await PreferenceService.saveUserName(_nameController.text.trim());
+      await PreferenceService.saveCityLocation(_city);
+      await PreferenceService.saveNotifEnabled(_notifEnabled);
 
       widget.onSaved();
-      Navigator.pop(context);
+      if (mounted) Navigator.pop(context);
     }
   }
 
@@ -383,10 +392,10 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
     final cities = PrayerTimeService.getAvailableCities();
 
     return AlertDialog(
-      backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       title: Text(
-        'Pengaturan 2 Profil Pengguna',
+        'Pengaturan Profil & Aplikasi',
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: isDark ? Colors.white : Colors.black87,
@@ -400,115 +409,14 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Pilih Profil Aktif:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 10),
-              // Profile selector row
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _activeIndex = 1;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: _activeIndex == 1
-                              ? const Color(0xFF8E2DE2).withOpacity(0.15)
-                              : (isDark ? const Color(0xFF130E26) : Colors.grey[200]),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: _activeIndex == 1 ? const Color(0xFF8E2DE2) : Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.person_rounded, color: Color(0xFF8E2DE2)),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Profil 1',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _activeIndex = 2;
-                        });
-                      },
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-                        decoration: BoxDecoration(
-                          color: _activeIndex == 2
-                              ? const Color(0xFF8E2DE2).withOpacity(0.15)
-                              : (isDark ? const Color(0xFF130E26) : Colors.grey[200]),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: _activeIndex == 2 ? const Color(0xFF8E2DE2) : Colors.transparent,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            const Icon(Icons.person_outline_rounded, color: Colors.blueAccent),
-                            const SizedBox(height: 4),
-                            Text(
-                              'Profil 2',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              const Divider(),
-              const SizedBox(height: 12),
-              Text(
-                'Detail Profil $_activeIndex:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13,
-                  color: _activeIndex == 1 ? const Color(0xFF8E2DE2) : Colors.blueAccent,
-                ),
-              ),
-              const SizedBox(height: 14),
               TextFormField(
-                controller: _activeIndex == 1 ? _nameController1 : _nameController2,
+                controller: _nameController,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   labelText: 'Nama Pengguna',
                   labelStyle: TextStyle(color: isDark ? Colors.white60 : Colors.black54),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-                  prefixIcon: const Icon(Icons.edit_rounded, size: 20),
+                  prefixIcon: const Icon(Icons.person_rounded, size: 20),
                 ),
                 validator: (val) {
                   if (val == null || val.trim().isEmpty) {
@@ -519,8 +427,8 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
-                value: _activeIndex == 1 ? _city1 : _city2,
-                dropdownColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+                value: _city,
+                dropdownColor: isDark ? const Color(0xFF133630) : Colors.white,
                 style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   labelText: 'Lokasi Kota (Info Sholat)',
@@ -537,13 +445,34 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
                 onChanged: (val) {
                   if (val != null) {
                     setState(() {
-                      if (_activeIndex == 1) {
-                        _city1 = val;
-                      } else {
-                        _city2 = val;
-                      }
+                      _city = val;
                     });
                   }
+                },
+              ),
+              const SizedBox(height: 16),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(
+                  'Aktifkan Notifikasi',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  'Pengingat waktu sholat dan target ibadah',
+                  style: TextStyle(
+                    color: isDark ? Colors.white60 : Colors.black54,
+                    fontSize: 12,
+                  ),
+                ),
+                value: _notifEnabled,
+                activeColor: const Color(0xFF1C6758),
+                onChanged: (val) {
+                  setState(() {
+                    _notifEnabled = val;
+                  });
                 },
               ),
             ],
@@ -561,7 +490,7 @@ class _ProfileSettingsDialogState extends State<ProfileSettingsDialog> {
         ElevatedButton(
           onPressed: _save,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF8E2DE2),
+            backgroundColor: const Color(0xFF1C6758),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),

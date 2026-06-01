@@ -67,7 +67,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: const Text('Hapus Doa?', style: TextStyle(fontWeight: FontWeight.bold)),
           content: const Text('Apakah Anda yakin ingin menghapus doa ini secara permanen?'),
@@ -109,7 +109,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
           title: Text(
             isEdit ? 'Edit Doa/Dzikir' : 'Tambah Doa/Dzikir',
@@ -211,7 +211,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8E2DE2),
+                backgroundColor: const Color(0xFF1C6758),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
@@ -252,8 +252,8 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF0F0C20), const Color(0xFF15102A)]
-                : [const Color(0xFFF3F2F7), const Color(0xFFE8E7F0)],
+                ? [const Color(0xFF09201C), const Color(0xFF0B2B26)]
+                : [const Color(0xFFF2F9F7), const Color(0xFFE2F0EA)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -279,7 +279,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
                     // Search Bar
                     Container(
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1E1938) : Colors.white,
+                        color: isDark ? const Color(0xFF133630) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
@@ -289,7 +289,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
                           )
                         ],
                         border: Border.all(
-                          color: isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05),
+                          color: isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05),
                           width: 1,
                         ),
                       ),
@@ -329,10 +329,10 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF1E1938) : Colors.white,
+                  color: isDark ? const Color(0xFF133630) : Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05),
+                    color: isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05),
                     width: 1,
                   ),
                 ),
@@ -343,7 +343,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
                   indicator: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                      colors: [Color(0xFF1C6758), Color(0xFF0E4338)],
                     ),
                   ),
                   labelColor: Colors.white,
@@ -375,7 +375,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddEditDoaDialog(),
-        backgroundColor: const Color(0xFF8E2DE2),
+        backgroundColor: const Color(0xFF1C6758),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 6,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
@@ -439,7 +439,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1938) : Colors.white,
+        color: isDark ? const Color(0xFF133630) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -449,7 +449,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
           )
         ],
         border: Border.all(
-          color: isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05),
+          color: isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05),
           width: 1,
         ),
       ),
@@ -464,13 +464,13 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
           width: 42,
           height: 42,
           decoration: BoxDecoration(
-            color: const Color(0xFF8E2DE2).withOpacity(0.15),
+            color: const Color(0xFF1C6758).withOpacity(0.15),
             shape: BoxShape.circle,
           ),
           child: const Center(
             child: Icon(
               Icons.menu_book_rounded,
-              color: Color(0xFF8E2DE2),
+              color: Color(0xFF1C6758),
               size: 20,
             ),
           ),
@@ -490,13 +490,13 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF8E2DE2).withOpacity(0.1),
+                  color: const Color(0xFF1C6758).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF8E2DE2).withOpacity(0.2)),
+                  border: Border.all(color: const Color(0xFF1C6758).withOpacity(0.2)),
                 ),
                 child: Text(
                   doa.kategori ?? 'Umum',
-                  style: const TextStyle(fontSize: 10, color: Color(0xFF8E2DE2), fontWeight: FontWeight.bold),
+                  style: const TextStyle(fontSize: 10, color: Color(0xFF1C6758), fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -552,7 +552,7 @@ class _DoaScreenState extends State<DoaScreen> with SingleTickerProviderStateMix
             width: double.infinity,
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
             decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF130E26).withOpacity(0.3) : Colors.grey[50],
+              color: isDark ? const Color(0xFF0A221E).withOpacity(0.3) : Colors.grey[50],
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(20),
                 bottomRight: Radius.circular(20),

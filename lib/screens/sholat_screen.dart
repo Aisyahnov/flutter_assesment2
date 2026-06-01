@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/sholat_tracker.dart';
 import '../repositories/sholat_repository.dart';
 import '../services/prayer_time_service.dart';
+import '../services/preference_service.dart';
 
 class SholatScreen extends StatefulWidget {
   final SholatRepository sholatRepository;
@@ -66,11 +67,12 @@ class _SholatScreenState extends State<SholatScreen> {
 
   Future<void> _loadLocalPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-    final activeIndex = prefs.getInt('active_user_index') ?? 1;
+    final name = await PreferenceService.getUserName();
+    final city = await PreferenceService.getCityLocation();
     setState(() {
       _streak = prefs.getInt('user_streak') ?? 0;
-      _userName = prefs.getString('user_name_$activeIndex') ?? (activeIndex == 1 ? (prefs.getString('user_name') ?? 'Pengguna 1') : 'Pengguna 2');
-      _cityLocation = prefs.getString('city_location_$activeIndex') ?? 'Jakarta';
+      _userName = name;
+      _cityLocation = city;
     });
   }
 
@@ -180,8 +182,8 @@ class _SholatScreenState extends State<SholatScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF0F0C20), const Color(0xFF15102A)]
-                : [const Color(0xFFF3F2F7), const Color(0xFFE8E7F0)],
+                ? [const Color(0xFF09201C), const Color(0xFF0B2B26)]
+                : [const Color(0xFFF2F9F7), const Color(0xFFE2F0EA)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -217,7 +219,7 @@ class _SholatScreenState extends State<SholatScreen> {
                             Icon(
                               Icons.location_on_rounded,
                               size: 14,
-                              color: isDark ? Colors.purpleAccent : const Color(0xFF8E2DE2),
+                              color: isDark ? Colors.purpleAccent : const Color(0xFF1C6758),
                             ),
                             const SizedBox(width: 4),
                             Text(
@@ -235,7 +237,7 @@ class _SholatScreenState extends State<SholatScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
                         color: isDark
-                            ? const Color(0xFF2C2250)
+                            ? const Color(0xFF1C4F46)
                             : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
@@ -364,19 +366,19 @@ class _SholatScreenState extends State<SholatScreen> {
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                        colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                        colors: [Color(0xFF1C6758), Color(0xFF0E4338)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
                     : null,
                 color: !isSelected
-                    ? (isDark ? const Color(0xFF1E1938) : Colors.white)
+                    ? (isDark ? const Color(0xFF133630) : Colors.white)
                     : null,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF4A00E0).withOpacity(0.4),
+                          color: const Color(0xFF0E4338).withOpacity(0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         )
@@ -391,7 +393,7 @@ class _SholatScreenState extends State<SholatScreen> {
                 border: Border.all(
                   color: isSelected
                       ? Colors.transparent
-                      : (isDark ? const Color(0xFF2C2450) : Colors.black12),
+                      : (isDark ? const Color(0xFF1C4F46) : Colors.black12),
                   width: 1,
                 ),
               ),
@@ -436,7 +438,7 @@ class _SholatScreenState extends State<SholatScreen> {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDark
-              ? [const Color(0xFF1E1938), const Color(0xFF251E49)]
+              ? [const Color(0xFF133630), const Color(0xFF18453E)]
               : [Colors.white, const Color(0xFFF9F9FB)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -450,7 +452,7 @@ class _SholatScreenState extends State<SholatScreen> {
           )
         ],
         border: Border.all(
-          color: isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05),
+          color: isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05),
           width: 1,
         ),
       ),
@@ -466,10 +468,10 @@ class _SholatScreenState extends State<SholatScreen> {
                   value: percentage,
                   strokeWidth: 8,
                   backgroundColor: isDark
-                      ? const Color(0xFF130E26)
+                      ? const Color(0xFF0A221E)
                       : Colors.purple.withOpacity(0.1),
                   valueColor: const AlwaysStoppedAnimation<Color>(
-                    Color(0xFF8E2DE2),
+                    Color(0xFF1C6758),
                   ),
                 ),
               ),
@@ -525,7 +527,7 @@ class _SholatScreenState extends State<SholatScreen> {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1938) : Colors.white,
+        color: isDark ? const Color(0xFF133630) : Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -537,7 +539,7 @@ class _SholatScreenState extends State<SholatScreen> {
         border: Border.all(
           color: isCompleted
               ? accentColor.withOpacity(0.4)
-              : (isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05)),
+              : (isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05)),
           width: 1.5,
         ),
       ),
@@ -549,7 +551,7 @@ class _SholatScreenState extends State<SholatScreen> {
           decoration: BoxDecoration(
             color: isCompleted
                 ? accentColor.withOpacity(0.2)
-                : (isDark ? const Color(0xFF130E26) : accentColor.withOpacity(0.1)),
+                : (isDark ? const Color(0xFF0A221E) : accentColor.withOpacity(0.1)),
             borderRadius: BorderRadius.circular(14),
           ),
           child: Icon(

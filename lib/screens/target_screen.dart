@@ -83,7 +83,7 @@ class _TargetScreenState extends State<TargetScreen> {
         final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return AlertDialog(
-          backgroundColor: isDark ? const Color(0xFF1E1938) : Colors.white,
+          backgroundColor: isDark ? const Color(0xFF133630) : Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
           ),
@@ -209,7 +209,7 @@ class _TargetScreenState extends State<TargetScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8E2DE2),
+                backgroundColor: const Color(0xFF1C6758),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -239,8 +239,8 @@ class _TargetScreenState extends State<TargetScreen> {
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: isDark
-                ? [const Color(0xFF0F0C20), const Color(0xFF15102A)]
-                : [const Color(0xFFF3F2F7), const Color(0xFFE8E7F0)],
+                ? [const Color(0xFF09201C), const Color(0xFF0B2B26)]
+                : [const Color(0xFFF2F9F7), const Color(0xFFE2F0EA)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -277,10 +277,10 @@ class _TargetScreenState extends State<TargetScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF2C2250) : Colors.white,
+                        color: isDark ? const Color(0xFF1C4F46) : Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: const Color(0xFF8E2DE2).withOpacity(0.3),
+                          color: const Color(0xFF1C6758).withOpacity(0.3),
                           width: 1.5,
                         ),
                       ),
@@ -288,7 +288,7 @@ class _TargetScreenState extends State<TargetScreen> {
                         children: [
                           Icon(
                             Icons.check_circle_outline_rounded,
-                            color: isDark ? Colors.purpleAccent : const Color(0xFF8E2DE2),
+                            color: isDark ? Colors.purpleAccent : const Color(0xFF1C6758),
                             size: 18,
                           ),
                           const SizedBox(width: 6),
@@ -296,7 +296,7 @@ class _TargetScreenState extends State<TargetScreen> {
                             '${_targets.where((t) => t.isCompleted).length}/${_targets.length} Selesai',
                             style: theme.textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.purpleAccent : const Color(0xFF8E2DE2),
+                              color: isDark ? Colors.purpleAccent : const Color(0xFF1C6758),
                             ),
                           ),
                         ],
@@ -330,7 +330,7 @@ class _TargetScreenState extends State<TargetScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddTargetDialog,
-        backgroundColor: const Color(0xFF8E2DE2),
+        backgroundColor: const Color(0xFF1C6758),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -372,19 +372,19 @@ class _TargetScreenState extends State<TargetScreen> {
               decoration: BoxDecoration(
                 gradient: isSelected
                     ? const LinearGradient(
-                        colors: [Color(0xFF8E2DE2), Color(0xFF4A00E0)],
+                        colors: [Color(0xFF1C6758), Color(0xFF0E4338)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       )
                     : null,
                 color: !isSelected
-                    ? (isDark ? const Color(0xFF1E1938) : Colors.white)
+                    ? (isDark ? const Color(0xFF133630) : Colors.white)
                     : null,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF4A00E0).withOpacity(0.4),
+                          color: const Color(0xFF0E4338).withOpacity(0.4),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         )
@@ -399,7 +399,7 @@ class _TargetScreenState extends State<TargetScreen> {
                 border: Border.all(
                   color: isSelected
                       ? Colors.transparent
-                      : (isDark ? const Color(0xFF2C2450) : Colors.black12),
+                      : (isDark ? const Color(0xFF1C4F46) : Colors.black12),
                   width: 1,
                 ),
               ),
@@ -473,13 +473,13 @@ class _TargetScreenState extends State<TargetScreen> {
   Widget _buildTargetCard(ThemeData theme, TargetIbadah target, bool isDark) {
     final progressVal = target.targetHarian > 0 ? (target.progress / target.targetHarian) : 0.0;
     final isSelesai = target.isCompleted;
-    final accentColor = isSelesai ? Colors.green : const Color(0xFF8E2DE2);
+    final accentColor = isSelesai ? Colors.green : const Color(0xFF1C6758);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1938) : Colors.white,
+        color: isDark ? const Color(0xFF133630) : Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -491,7 +491,7 @@ class _TargetScreenState extends State<TargetScreen> {
         border: Border.all(
           color: isSelesai
               ? Colors.green.withOpacity(0.4)
-              : (isDark ? const Color(0xFF2C2450) : Colors.black.withOpacity(0.05)),
+              : (isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05)),
           width: 1.5,
         ),
       ),
@@ -508,7 +508,7 @@ class _TargetScreenState extends State<TargetScreen> {
                   decoration: BoxDecoration(
                     color: isSelesai
                         ? Colors.green.withOpacity(0.15)
-                        : (isDark ? const Color(0xFF130E26) : const Color(0xFF8E2DE2).withOpacity(0.1)),
+                        : (isDark ? const Color(0xFF0A221E) : const Color(0xFF1C6758).withOpacity(0.1)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
@@ -580,7 +580,7 @@ class _TargetScreenState extends State<TargetScreen> {
                         child: LinearProgressIndicator(
                           value: progressVal > 1.0 ? 1.0 : progressVal,
                           minHeight: 8,
-                          backgroundColor: isDark ? const Color(0xFF130E26) : Colors.black12,
+                          backgroundColor: isDark ? const Color(0xFF0A221E) : Colors.black12,
                           valueColor: AlwaysStoppedAnimation<Color>(accentColor),
                         ),
                       ),
@@ -596,7 +596,7 @@ class _TargetScreenState extends State<TargetScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF2C2250) : Colors.grey[200],
+                          color: isDark ? const Color(0xFF1C4F46) : Colors.grey[200],
                           shape: BoxShape.circle,
                         ),
                         child: Icon(
@@ -612,7 +612,7 @@ class _TargetScreenState extends State<TargetScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8E2DE2),
+                          color: const Color(0xFF1C6758),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
