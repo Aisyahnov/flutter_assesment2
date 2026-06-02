@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'db/database_helper.dart';
 import 'repositories/sholat_repository.dart';
@@ -19,12 +20,89 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id_ID', null);
   if (!kIsWeb) {
+    await DatabaseHelper.instance.seedIfEmpty();
     final db = await DatabaseHelper.instance.database;
     print('DB berhasil dibuka: ${db.path}');
   } else {
+    await _seedWebDataIfEmpty();
     print('Running on Web: Menggunakan database simulasi (SharedPreferences)');
   }
   runApp(const MyApp());
+}
+
+Future<void> _seedWebDataIfEmpty() async {
+  final prefs = await SharedPreferences.getInstance();
+  const keys = ['web_koleksi_doa', 'web_target_ibadah', 'web_jurnal_harian', 'web_sholat_tracker'];
+  
+  // Check if any data exists
+  bool hasData = false;
+  for (var key in keys) {
+    if (prefs.containsKey(key)) {
+      hasData = true;
+      break;
+    }
+  }
+
+  if (hasData) return;
+
+  final now = DateTime.now();
+  final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+  // Seed Doa
+  int _doaIdBase = DateTime.now().millisecondsSinceEpoch;
+  final doaList = [
+    {'id': _doaIdBase++, 'judul': 'Doa Sebelum Makan', 'isi_doa': 'اللَّهُمَّ بَارِكْ لَنَا فِيمَا رَزَقْتَنَا وَقِنَا عَذَابَ النَّارِ', 'terjemahan': 'Ya Allah, berkahilah kami dalam rezeki yang telah Engkau berikan kepada kami dan peliharalah kami dari siksa api neraka.', 'kategori': 'Harian', 'is_favorit': 0},
+    {'id': _doaIdBase++, 'judul': 'Doa Sesudah Makan', 'isi_doa': 'الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ', 'terjemahan': 'Segala puji bagi Allah yang telah memberi kami makan dan minum serta menjadikan kami orang-orang muslim.', 'kategori': 'Harian', 'is_favorit': 0},
+    {'id': _doaIdBase++, 'judul': 'Doa Sebelum Tidur', 'isi_doa': 'بِاسْمِكَ اللَّهُمَّ أَحْيَا وَأَمُوتُ', 'terjemahan': 'Dengan nama-Mu ya Allah, aku hidup dan aku mati.', 'kategori': 'Harian', 'is_favorit': 0},
+    {'id': _doaIdBase++, 'judul': 'Doa Bangun Tidur', 'isi_doa': 'الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ', 'terjemahan': 'Segala puji bagi Allah yang telah menghidupkan kami setelah mematikan kami dan kepada-Nya lah kami kembali.', 'kategori': 'Harian', 'is_favorit': 0},
+    {'id': _doaIdBase++, 'judul': 'Doa Masuk Kamar Mandi', 'isi_doa': 'اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ', 'terjemahan': 'Ya Allah, sesungguhnya aku berlindung kepada-Mu dari godaan syaitan laki-laki dan syaitan perempuan.', 'kategori': 'Harian', 'is_favorit': 0},
+  ];
+  await prefs.setString('web_koleksi_doa', json.encode(doaList));
+
+  // Seed Target
+  int _targetIdBase = DateTime.now().millisecondsSinceEpoch + 1000;
+  final targetList = [
+    {'id': _targetIdBase++, 'nama_target': 'Baca Al-Qur\'an', 'jenis': 'Ibadah', 'target_harian': 5, 'progress': 2, 'satuan': 'Halaman', 'tanggal': todayStr, 'is_selesai': 0},
+    {'id': _targetIdBase++, 'nama_target': 'Sedekah', 'jenis': 'Sosial', 'target_harian': 10000, 'progress': 5000, 'satuan': 'Rupiah', 'tanggal': todayStr, 'is_selesai': 0},
+    {'id': _targetIdBase++, 'nama_target': 'Sholawat', 'jenis': 'Dzikir', 'target_harian': 1000, 'progress': 500, 'satuan': 'Kali', 'tanggal': todayStr, 'is_selesai': 0},
+    {'id': _targetIdBase++, 'nama_target': 'Hafalan Surat', 'jenis': 'Pendidikan', 'target_harian': 1, 'progress': 0, 'satuan': 'Surat', 'tanggal': todayStr, 'is_selesai': 0},
+    {'id': _targetIdBase++, 'nama_target': 'Dzikir Pagi', 'jenis': 'Dzikir', 'target_harian': 33, 'progress': 33, 'satuan': 'Kali', 'tanggal': todayStr, 'is_selesai': 1},
+  ];
+  await prefs.setString('web_target_ibadah', json.encode(targetList));
+
+  // Seed Jurnal
+  int _jurnalIdBase = DateTime.now().millisecondsSinceEpoch + 2000;
+  final List<Map<String, dynamic>> jurnalList = [];
+  for (int i = 0; i < 5; i++) {
+    final date = now.subtract(Duration(days: i));
+    final dateStr = "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+    jurnalList.add({
+      'id': _jurnalIdBase++,
+      'tanggal': dateStr,
+      'mood': ['😀', '😐', '😌', '💪', '🙌'][i],
+      'catatan': 'Hari ini adalah hari ke-${i + 1} yang sangat produktif. Terus semangat!',
+      'syukur': 'Masih diberikan kesehatan dan kesempatan beribadah.',
+      'evaluasi': 'Perlu meningkatkan kekhusyukan dalam sholat.',
+    });
+  }
+  await prefs.setString('web_jurnal_harian', json.encode(jurnalList));
+
+  // Seed Sholat
+  int _sholatIdBase = DateTime.now().millisecondsSinceEpoch + 3000;
+  final Map<String, dynamic> sholatData = {};
+  final List<Map<String, dynamic>> todaySholat = [];
+  final sholatWaktu = ['Subuh', 'Dzuhur', 'Ashar', 'Maghrib', 'Isya'];
+  for (var waktu in sholatWaktu) {
+    todaySholat.add({
+      'id': _sholatIdBase++,
+      'tanggal': todayStr,
+      'waktu': waktu,
+      'status': waktu == 'Subuh' || waktu == 'Dzuhur' ? 'selesai' : 'belum',
+      'catatan': 'Alhamdulillah',
+    });
+  }
+  sholatData[todayStr] = todaySholat;
+  await prefs.setString('web_sholat_tracker', json.encode(sholatData));
 }
 
 class MyApp extends StatefulWidget {

@@ -70,11 +70,12 @@ class _TargetScreenState extends State<TargetScreen> {
     _loadTargets();
   }
 
-  void _showAddTargetDialog() {
-    final nameController = TextEditingController();
-    final jenisController = TextEditingController(text: 'Harian');
-    final targetHarianController = TextEditingController(text: '1');
-    final satuanController = TextEditingController(text: 'Kali');
+  void _showAddEditTargetDialog({TargetIbadah? target}) {
+    final isEdit = target != null;
+    final nameController = TextEditingController(text: target?.namaTarget ?? '');
+    final jenisController = TextEditingController(text: target?.jenis ?? 'Harian');
+    final targetHarianController = TextEditingController(text: target?.targetHarian.toString() ?? '1');
+    final satuanController = TextEditingController(text: target?.satuan ?? 'Kali');
     final formKey = GlobalKey<FormState>();
 
     showDialog(
@@ -88,7 +89,7 @@ class _TargetScreenState extends State<TargetScreen> {
             borderRadius: BorderRadius.circular(24),
           ),
           title: Text(
-            'Tambah Target Baru',
+            isEdit ? 'Edit Target Ibadah' : 'Tambah Target Baru',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white : Colors.black87,
@@ -196,14 +197,21 @@ class _TargetScreenState extends State<TargetScreen> {
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
                   final newTarget = TargetIbadah(
+                    id: target?.id,
                     namaTarget: nameController.text.trim(),
                     jenis: jenisController.text.trim(),
                     targetHarian: int.parse(targetHarianController.text.trim()),
+                    progress: isEdit ? target.progress : 0,
                     satuan: satuanController.text.trim(),
-                    tanggal: _formatDate(_selectedDate),
+                    tanggal: isEdit ? target.tanggal : _formatDate(_selectedDate),
                   );
 
-                  await widget.targetRepository.insertTarget(newTarget);
+                  if (isEdit) {
+                    await widget.targetRepository.updateTarget(newTarget);
+                  } else {
+                    await widget.targetRepository.insertTarget(newTarget);
+                  }
+                  
                   Navigator.pop(context);
                   _loadTargets();
                 }
@@ -215,8 +223,8 @@ class _TargetScreenState extends State<TargetScreen> {
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               ),
-              child: const Text(
-                'Simpan',
+              child: Text(
+                isEdit ? 'Simpan' : 'Tambah',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -329,7 +337,7 @@ class _TargetScreenState extends State<TargetScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTargetDialog,
+        onPressed: () => _showAddEditTargetDialog(),
         backgroundColor: const Color(0xFF1C6758),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
@@ -539,9 +547,37 @@ class _TargetScreenState extends State<TargetScreen> {
                     ],
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 22),
-                  onPressed: () => _deleteTarget(target.id!),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.more_vert_rounded, color: isDark ? Colors.white54 : Colors.black54),
+                  onSelected: (value) {
+                    if (value == 'edit') {
+                      _showAddEditTargetDialog(target: target);
+                    } else if (value == 'delete') {
+                      _deleteTarget(target.id!);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_rounded, size: 18),
+                          SizedBox(width: 8),
+                          Text('Edit Target'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 18),
+                          SizedBox(width: 8),
+                          Text('Hapus', style: TextStyle(color: Colors.redAccent)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
