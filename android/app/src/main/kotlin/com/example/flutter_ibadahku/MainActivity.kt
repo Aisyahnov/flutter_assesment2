@@ -1,4 +1,4 @@
-package com.example.flutter_assesment2
+package com.example.flutter_ibadahku
 
 import io.flutter.embedding.android.FlutterActivity
 

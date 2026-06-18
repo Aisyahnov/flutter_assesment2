@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_assesment2/db/database_helper.dart';
-import 'package:flutter_assesment2/models/sholat_tracker.dart';
-import 'package:flutter_assesment2/models/target_ibadah.dart';
-import 'package:flutter_assesment2/models/koleksi_doa.dart';
-import 'package:flutter_assesment2/models/jurnal_harian.dart';
+import 'package:flutter_ibadahku/db/database_helper.dart';
+import 'package:flutter_ibadahku/models/sholat_tracker.dart';
+import 'package:flutter_ibadahku/models/target_ibadah.dart';
+import 'package:flutter_ibadahku/models/koleksi_doa.dart';
+import 'package:flutter_ibadahku/models/jurnal_harian.dart';
 
 void main() {
   group('Model Tests', () {
@@ -97,7 +97,7 @@ void main() {
       final jurnal = JurnalHarian(
         id: 4,
         tanggal: '2026-05-26',
-        mood: '😇',
+        mood: 'ðŸ˜‡',
         catatan: 'Sholat fardhu lengkap dan tilawah 2 lembar',
         syukur: 'Alhamdulillah sehat wal afiat',
         evaluasi: 'Kurang sholat sunnah rawatib',
@@ -106,7 +106,7 @@ void main() {
       final map = jurnal.toMap();
       expect(map['id'], 4);
       expect(map['tanggal'], '2026-05-26');
-      expect(map['mood'], '😇');
+      expect(map['mood'], 'ðŸ˜‡');
       expect(map['catatan'], 'Sholat fardhu lengkap dan tilawah 2 lembar');
       expect(map['syukur'], 'Alhamdulillah sehat wal afiat');
       expect(map['evaluasi'], 'Kurang sholat sunnah rawatib');
@@ -114,7 +114,7 @@ void main() {
       final fromMap = JurnalHarian.fromMap(map);
       expect(fromMap.id, 4);
       expect(fromMap.tanggal, '2026-05-26');
-      expect(fromMap.mood, '😇');
+      expect(fromMap.mood, 'ðŸ˜‡');
       expect(fromMap.catatan, 'Sholat fardhu lengkap dan tilawah 2 lembar');
       expect(fromMap.syukur, 'Alhamdulillah sehat wal afiat');
       expect(fromMap.evaluasi, 'Kurang sholat sunnah rawatib');

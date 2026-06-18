@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/target_ibadah.dart';
 import '../repositories/target_repository.dart';
+import '../widgets/target_card_widget.dart';
 
 class TargetScreen extends StatefulWidget {
   final TargetRepository targetRepository;
@@ -328,7 +329,15 @@ class _TargetScreenState extends State<TargetScreen> {
                             physics: const BouncingScrollPhysics(),
                             itemCount: _targets.length,
                             itemBuilder: (context, index) {
-                              return _buildTargetCard(theme, _targets[index], isDark);
+                              return TargetCardWidget(
+                                theme: theme,
+                                target: _targets[index],
+                                isDark: isDark,
+                                onEdit: () => _showAddEditTargetDialog(target: _targets[index]),
+                                onDelete: () => _deleteTarget(_targets[index].id!),
+                                onIncrement: () => _incrementProgress(_targets[index]),
+                                onDecrement: () => _decrementProgress(_targets[index]),
+                              );
                             },
                           ),
               ),
@@ -474,196 +483,6 @@ class _TargetScreenState extends State<TargetScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildTargetCard(ThemeData theme, TargetIbadah target, bool isDark) {
-    final progressVal = target.targetHarian > 0 ? (target.progress / target.targetHarian) : 0.0;
-    final isSelesai = target.isCompleted;
-    final accentColor = isSelesai ? Colors.green : const Color(0xFF1C6758);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF133630) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-        border: Border.all(
-          color: isSelesai
-              ? Colors.green.withOpacity(0.4)
-              : (isDark ? const Color(0xFF1C4F46) : Colors.black.withOpacity(0.05)),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 12, 12),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: isSelesai
-                        ? Colors.green.withOpacity(0.15)
-                        : (isDark ? const Color(0xFF0A221E) : const Color(0xFF1C6758).withOpacity(0.1)),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    isSelesai ? Icons.check_circle_rounded : Icons.star_border_rounded,
-                    color: accentColor,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        target.namaTarget,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                          decoration: isSelesai ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Kategori: ${target.jenis}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: isDark ? Colors.white38 : Colors.black45,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert_rounded, color: isDark ? Colors.white54 : Colors.black54),
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      _showAddEditTargetDialog(target: target);
-                    } else if (value == 'delete') {
-                      _deleteTarget(target.id!);
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_rounded, size: 18),
-                          SizedBox(width: 8),
-                          Text('Edit Target'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 18),
-                          SizedBox(width: 8),
-                          Text('Hapus', style: TextStyle(color: Colors.redAccent)),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Pencapaian: ${target.progress} / ${target.targetHarian} ${target.satuan}',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white60 : Colors.black54,
-                            ),
-                          ),
-                          Text(
-                            '${(progressVal * 100).toInt()}%',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: accentColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: progressVal > 1.0 ? 1.0 : progressVal,
-                          minHeight: 8,
-                          backgroundColor: isDark ? const Color(0xFF0A221E) : Colors.black12,
-                          valueColor: AlwaysStoppedAnimation<Color>(accentColor),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 20),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    GestureDetector(
-                      onTap: () => _decrementProgress(target),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isDark ? const Color(0xFF1C4F46) : Colors.grey[200],
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.remove,
-                          size: 18,
-                          color: isDark ? Colors.white70 : Colors.black87,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    GestureDetector(
-                      onTap: () => _incrementProgress(target),
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1C6758),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
       ),
     );
   }
