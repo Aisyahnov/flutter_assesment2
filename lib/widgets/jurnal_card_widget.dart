@@ -94,12 +94,23 @@ class JurnalCardWidget extends StatelessWidget {
             width: 1,
           ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Stack(
           children: [
+            // Background Decoration (Drawing / CustomPaint)
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24),
+                child: CustomPaint(
+                  painter: JurnalDecorationPainter(isDark: isDark),
+                ),
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
             // Header of card (Mood & Instruction)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 20, 12, 12),
+              padding: const EdgeInsets.fromLTRB(36, 20, 12, 12),
               child: Row(
                 children: [
                   Container(
@@ -143,7 +154,7 @@ class JurnalCardWidget extends StatelessWidget {
 
             // Catatan Ibadah
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.fromLTRB(36, 20, 20, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -181,7 +192,9 @@ class JurnalCardWidget extends StatelessWidget {
               ),
             ),
           ],
-        ),
+        ), // end Column
+          ],
+        ), // end Stack
       ),
     );
   }
@@ -232,4 +245,58 @@ class JurnalCardWidget extends StatelessWidget {
       ],
     );
   }
+}
+
+// Tambahan fitur Drawing (CustomPaint) untuk dipresentasikan!
+class JurnalDecorationPainter extends CustomPainter {
+  final bool isDark;
+
+  JurnalDecorationPainter({required this.isDark});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Menggambar ring binder (buku spiral) di pinggir kiri jurnal
+
+    // Warna lubang kertas (menyamakan dengan warna background scaffold)
+    final holePaint = Paint()
+      ..color = isDark ? const Color(0xFF09201C) : const Color(0xFFF2F9F7)
+      ..style = PaintingStyle.fill;
+      
+    // Warna besi spiral
+    final ringPaint = Paint()
+      ..color = isDark ? Colors.grey[700]! : Colors.grey[400]!
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 3.5
+      ..strokeCap = StrokeCap.round;
+
+    final ringHighlight = Paint()
+      ..color = isDark ? Colors.grey[500]! : Colors.grey[300]!
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+
+    int numberOfRings = 5;
+    double startY = 30.0;
+    double endY = size.height - 30.0;
+    double spacing = (endY - startY) / (numberOfRings - 1);
+
+    for (int i = 0; i < numberOfRings; i++) {
+      double y = startY + (i * spacing);
+      
+      // 1. Gambar lubang kertas
+      canvas.drawCircle(Offset(16, y), 5.5, holePaint);
+      
+      // 2. Gambar besi spiral yang melengkung masuk ke lubang
+      Path ringPath = Path();
+      ringPath.moveTo(0, y - 4);
+      ringPath.quadraticBezierTo(16, y - 8, 16, y);
+      ringPath.quadraticBezierTo(16, y + 8, 0, y + 4);
+      
+      canvas.drawPath(ringPath, ringPaint);
+      canvas.drawPath(ringPath, ringHighlight);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
