@@ -137,13 +137,16 @@ class JurnalCardWidget extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    'Tahan Lama untuk Aksi',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontStyle: FontStyle.italic,
-                      color: isDark ? Colors.white38 : Colors.black45,
+                  Expanded(
+                    child: Text(
+                      'Tahan Lama untuk Aksi',
+                      textAlign: TextAlign.right,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontStyle: FontStyle.italic,
+                        color: isDark ? Colors.white38 : Colors.black45,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
